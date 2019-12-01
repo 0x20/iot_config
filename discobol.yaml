@@ -1,0 +1,65 @@
+esphome:
+    name: discobol
+    platform: ESP32
+    board: esp32doit-devkit-v1
+
+logger:
+  level: DEBUG
+
+wifi:
+  ssid: "0x20"
+  password: !secret wifipassword
+
+mqtt:
+  broker: !secret mqtthost
+
+# web_server:
+#   port: 80
+
+ota:
+  safe_mode: True
+  password: !secret otapassword
+
+light:
+    - platform: fastled_clockless
+      chipset: WS2812B
+      pin: GPIO25
+      num_leds: 32
+      rgb_order: GRB
+      name: "Disco FastLED Light"
+
+      effects:
+         # Use default parameters:
+        - random:
+        # Customize parameters
+        - random:
+            name: "My Slow Random Effect"
+            transition_length: 30s
+            update_interval: 30s
+        - random:
+            name: "My Fast Random Effect"
+            transition_length: 4s
+            update_interval: 5s
+        - addressable_flicker:
+        - addressable_flicker:
+            name: Flicker Effect With Custom Values
+            update_interval: 16ms
+            intensity: 55%
+        - addressable_twinkle:
+        - addressable_twinkle:
+            name: Twinkle Effect With Custom Values
+            twinkle_probability: 55%
+            progress_interval: 4ms
+        - addressable_random_twinkle:
+        - addressable_random_twinkle:
+            name: Random Twinkle Effect With Custom Values
+            twinkle_probability: 55%
+            progress_interval: 32ms
+        - addressable_fireworks:
+        - addressable_fireworks:
+            name: Fireworks Effect With Custom Values
+            update_interval: 32ms
+            spark_probability: 10%
+            use_random_color: false
+            fade_out_rate: 120
+

@@ -1,0 +1,62 @@
+esphome:
+  name: powermeasure
+  platform: ESP8266
+  board: nodemcuv2
+
+wifi:
+  ssid: "iot"
+  password: !secret wifipassword 
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  safe_mode: True
+  password: !secret otapassword
+
+i2c:
+  scl: GPIO5 #D1
+  sda: GPIO4 #D2
+  scan: True
+
+#   display:
+#     - platform: lcd_pcf8574
+#       dimensions: 16x2
+#       address: 0x27
+#       update_interval: 1s
+#       lambda: |-
+#         it.printf("water: %g gas: %g", id(water).state,id(gas).state);
+#         it.printf(0,1,"%gA %gA", id(phase_1).state,id(phase_2).state);
+
+ads1115:
+  - address: 0x48
+sensor:
+# - platform: pulse_counter
+#   pin: GPIO13 #D7
+#   unit_of_measurement: 'm3'
+#   name: 'water'
+#    absolute_count_mode: true
+#   id: water
+#   update_interval: 1s
+#   internal_filter: 100us
+# - platform: pulse_counter
+#   pin: GPIO2 #D4
+#   unit_of_measurement: 'm3'
+#   name: 'gas'
+#    absolute_count_mode: true
+#   id: gas
+#   update_interval: 1s
+#   internal_filter: 100us
+  - platform: ads1115
+    multiplexer: 'A0_A1'
+    gain: 6.144
+    name: "phase 1"
+    id: phase_1
+  - platform: ads1115
+    multiplexer: 'A2_A3'
+    gain: 6.144
+    name: "phase 2"
+    id: phase_2

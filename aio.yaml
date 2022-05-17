@@ -1,0 +1,132 @@
+esphome:
+  name: aio
+  platform: ESP32
+  # pinout is the same as the dev kit C, specs are the same as the hornbill32dev
+  board: hornbill32dev
+
+wifi:
+  ssid: "iot"
+  domain: ".lan.0x20.be"
+  password: !secret wifipassword
+
+# disabled to reduce noise on the broker
+logger:
+  # since GPIO{3,1} are being used for pms_uart
+  baud_rate: 0
+ota:
+
+api:
+
+mqtt:
+  broker: mqtt.lan.0x20.be
+  topic_prefix: "hsg/aio"
+
+
+### DS18B20
+dallas:
+  - pin: GPIO14
+    update_interval: 0.8s
+
+### PMSA003-A
+uart:
+  - id: "pms_uart"
+    baud_rate: 9600
+    rx_pin: GPIO3
+    tx_pin: GPIO1
+
+### MH-Z19
+  - id: "co2_uart"
+    baud_rate: 9600
+    rx_pin: GPIO12
+    tx_pin: GPIO13
+
+### BME680
+i2c:
+#  sda: GPIO21
+#  scl: GPIO22
+bme680_bsec:
+
+sensor:
+  ### BME680
+## this works
+#  - platform: bme680
+#    temperature:
+#      name: "BME680 Temperature"
+#    pressure:
+#      name: "BME680 Pressure"
+#    humidity:
+#      name: "BME680 Humidity"
+#    gas_resistance:
+#      name: "BME680 Gas Resistance"
+#    address: 0x76
+#    update_interval: 60s
+
+  - platform: bme680_bsec
+    temperature:
+      name: "BME680 Temperature"
+      accuracy_decimals: 2
+      retain: false
+    pressure:
+      name: "BME680 Pressure"
+      accuracy_decimals: 2
+      retain: false
+    humidity:
+      name: "BME680 Humidity"
+      accuracy_decimals: 2
+      retain: false
+    gas_resistance:
+      name: "BME680 Gas Resistance"
+      retain: false
+    iaq:
+      name: "BME680 IAQ"
+      accuracy_decimals: 1
+      retain: false
+    iaq_accuracy:
+      name: "BME680 Numeric IAQ Accuracy"
+    co2_equivalent:
+      name: "BME680 CO2 Equivalent"
+      accuracy_decimals: 1
+      retain: false
+    breath_voc_equivalent:
+      name: "BME680 Breath VOC Equivalent"
+      accuracy_decimals: 2
+      retain: false
+
+### PMSA003-A
+  - platform: pmsx003
+    type: PMSX003
+    uart_id: "pms_uart"
+    pm_1_0:
+      name: "Particulate Matter <1.0µm Concentration"
+      retain: false
+    pm_2_5:
+      name: "Particulate Matter <2.5µm Concentration"
+      retain: false
+    pm_10_0:
+      name: "Particulate Matter <10.0µm Concentration"
+      retain: false
+
+### MH-Z19
+  - platform: mhz19
+    uart_id: "co2_uart"
+    co2:
+      name: "MH-Z19 CO2 Value"
+      retain: false
+    temperature:
+      name: "MH-Z19 Temperature"
+      retain: false
+    update_interval: 10s
+    automatic_baseline_calibration: true
+
+### DS18B20
+  - platform: dallas
+    name: "DS18B20"
+    address: 0x8a01144f5e17aa28
+    accuracy_decimals: 2
+    retain: false
+
+text_sensor:
+  - platform: bme680_bsec
+    iaq_accuracy:
+      name: "BME680 IAQ Accuracy"
+      retain: false

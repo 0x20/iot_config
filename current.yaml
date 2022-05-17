@@ -1,0 +1,146 @@
+esphome:
+  name: current
+  platform: ESP8266
+  #board: d1
+  board: d1_mini_pro
+
+wifi:
+  ssid: "iot"
+  domain: ".lan.0x20.be"
+  password: !secret wifipassword
+
+logger:
+ota:
+mqtt:
+  broker: mqtt.lan.0x20.be
+  topic_prefix: "hsg/current"
+
+i2c:
+  sda: GPIO4
+  scl: GPIO5
+  scan: true
+  # esphome docs indicate max of 800kHz
+  # ADS1115 indicate a max of 100kHz in standard and 400kHz in fast mode
+  # and a max of 3.4MHz on request by activating high-speed mode
+  frequency: 3.4MHz # 100kHz gets glitchy on d1_mini_pro, 3.4MHz seems to work
+
+ads1115:
+
+  - address: 0x48
+    id: ads1115_48
+    continuous_mode: on
+
+  - address: 0x49
+    id: ads1115_49
+    continuous_mode: on
+
+sensor:
+
+  - platform: ads1115
+    ads1115_id: ads1115_48
+    update_interval: never
+    multiplexer: "A0_A3"
+    gain: 0.256
+    name: "A0_1"
+    id: "A0_1"
+  - platform: ads1115
+    ads1115_id: ads1115_48
+    update_interval: never
+    multiplexer: "A1_A3"
+    gain: 0.256
+    name: "A1_1"
+    id: "A1_1"
+  - platform: ads1115
+    ads1115_id: ads1115_48
+    update_interval: never
+    multiplexer: "A2_A3"
+    gain: 0.256
+    name: "A2_1"
+    id: "A2_1"
+
+  - platform: ads1115
+    ads1115_id: ads1115_49
+    update_interval: never
+    multiplexer: "A0_A3"
+    gain: 0.256
+    name: "A0_2"
+    id: "A0_2"
+  - platform: ads1115
+    ads1115_id: ads1115_49
+    update_interval: never
+    multiplexer: "A1_A3"
+    gain: 0.256
+    name: "A1_2"
+    id: "A1_2"
+  - platform: ads1115
+    ads1115_id: ads1115_49
+    update_interval: never
+    multiplexer: "A2_A3"
+    gain: 0.256
+    name: "A2_2"
+    id: "A2_2"
+
+
+  # total current, higher gain and unused inputs
+  - platform: ct_clamp
+    sensor: A0_1
+    name: "channel 0"
+    sample_duration: 400ms
+    update_interval: 1s
+    accuracy_decimals: 5
+    filters:
+      - calibrate_linear:
+        - 0.000015 -> 0
+        - 0.007575 -> 0.50
+  - platform: ct_clamp
+    sensor: A1_1
+    name: "channel 1"
+    sample_duration: 400ms
+    update_interval: 1s
+    accuracy_decimals: 5
+    filters:
+      - calibrate_linear:
+        - 0 -> 0
+        - 0.011 -> 0.32
+  - platform: ct_clamp
+    sensor: A2_1
+    name: "channel 2"
+    sample_duration: 400ms
+    update_interval: 1s
+    accuracy_decimals: 5
+    filters:
+      - calibrate_linear:
+        - 0 -> 0
+        - 1 -> 1
+
+  # three times the same clamp
+  - platform: ct_clamp
+    sensor: A0_2
+    name: "channel 3"
+    sample_duration: 400ms
+    update_interval: 1s
+    accuracy_decimals: 5
+    filters:
+      - calibrate_linear:
+        - 0.000015 -> 0
+        - 0.007575 -> 0.50
+  - platform: ct_clamp
+    sensor: A1_2
+    name: "channel 4"
+    sample_duration: 400ms
+    update_interval: 1s
+    accuracy_decimals: 5
+    filters:
+      - calibrate_linear:
+        - 0.000015 -> 0
+        - 0.007575 -> 0.50
+  - platform: ct_clamp
+    sensor: A2_2
+    name: "channel 5"
+    sample_duration: 400ms
+    update_interval: 1s
+    accuracy_decimals: 5
+    filters:
+      - calibrate_linear:
+        - 0.000015 -> 0
+        - 0.007575 -> 0.50

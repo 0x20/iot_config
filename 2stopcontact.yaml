@@ -1,5 +1,5 @@
 esphome:
-  name: sonoff_2stopcontact
+  name: 2stopcontact
   platform: ESP8266
   board: esp01_1m
 
@@ -12,8 +12,16 @@ wifi:
 api:
 
 logger:
-    level: ERROR
+
 ota:
+
+mqtt:
+  broker: mqtt.lan.0x20.be
+  topic_prefix: "hsg/2stopcontact"
+  on_message:
+    topic: "hsg/2stopcontact/toggle"
+    then:
+      - switch.toggle: relay
 
 binary_sensor:
   - platform: gpio
@@ -24,6 +32,9 @@ binary_sensor:
     name: "Sonoff Basic Button"
     on_press:
       - switch.toggle: relay
+      - mqtt.publish:
+          topic: "hsg/2stopcontact/toggle"
+          payload: "button pressed"
 
 switch:
   - platform: gpio

@@ -1,0 +1,68 @@
+esphome:
+  name: backroof
+  platform: ESP8266
+  board: d1_mini
+
+wifi:
+  ssid: 'iot'
+  domain: ".lan.0x20.be"
+  password: !secret wifipassword
+  fast_connect: false
+
+api:
+
+logger:
+
+ota:
+
+mqtt:
+  broker: mqtt.lan.0x20.be
+  topic_prefix: "hsg/backroof"
+  on_message:
+    topic: "hsg/roof/close"
+    then:
+      - switch.turn_on: relay_dir
+      - switch.turn_on: relay_en
+
+binary_sensor:
+  - platform: gpio
+    name: "switch down"
+    pin:
+      number: D5
+      mode: INPUT_PULLUP
+      inverted: true
+    on_press:
+      - switch.turn_on: relay_dir
+      - switch.turn_on: relay_en
+      - mqtt.publish:
+          topic: "hsg/backroof/closing"
+          payload: "switch"
+  - platform: gpio
+    name: "switch up"
+    pin:
+      number: D2
+      mode: INPUT_PULLUP
+      inverted: true
+    on_press:
+      - switch.turn_off: relay_dir
+      - switch.turn_on: relay_en
+      - mqtt.publish:
+          topic: "hsg/backroof/opening"
+          payload: "switch"
+
+switch:
+  - platform: gpio
+    name: "roof enable relay"
+    id: relay_en
+    pin: D3
+    inverted: true
+  - platform: gpio
+    name: "roof direction relay"
+    id: relay_dir
+    pin: D4
+    inverted: true
+
+status_led:
+  pin:
+    number: D1
+    inverted: yes

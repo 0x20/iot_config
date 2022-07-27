@@ -5,6 +5,7 @@ esphome:
 
 wifi:
   ssid: 'iot'
+  domain: ".lan.0x20.be"
   password: !secret wifipassword
   fast_connect: false
 

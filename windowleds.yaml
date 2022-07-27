@@ -5,6 +5,7 @@ esphome:
 
 wifi:
   ssid: "0x20"
+  domain: ".lan.0x20.be"
   password: !secret wifipassword
 
 mqtt:

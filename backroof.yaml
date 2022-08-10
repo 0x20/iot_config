@@ -19,10 +19,24 @@ mqtt:
   broker: mqtt.lan.0x20.be
   topic_prefix: "hsg/backroof"
   on_message:
-    topic: "hsg/roof/close"
-    then:
-      - switch.turn_on: relay_dir
-      - switch.turn_on: relay_en
+    - topic: "hsg/backroof/direction"
+      payload: "0"
+      then:
+        - switch.turn_on: relay_en
+        - switch.turn_off: relay_dir
+    - topic: "hsg/backroof/direction"
+      payload: "1"
+      then:
+        - switch.turn_on: relay_en
+        - switch.turn_on: relay_dir
+    - topic: "hsg/backroof/power"
+      payload: "1"
+      then:
+        - switch.turn_on: relay_en
+    - topic: "hsg/backroof/power"
+      payload: "0"
+      then:
+        - switch.turn_off: relay_en
 
 binary_sensor:
   - platform: gpio
@@ -32,11 +46,12 @@ binary_sensor:
       mode: INPUT_PULLUP
       inverted: true
     on_press:
-      - switch.turn_on: relay_dir
-      - switch.turn_on: relay_en
-      - mqtt.publish:
-          topic: "hsg/backroof/closing"
-          payload: "switch"
+      then:
+        - switch.turn_off: relay_dir
+        - switch.turn_on: relay_en
+    on_release:
+      then:
+        - switch.turn_off: relay_en
   - platform: gpio
     name: "switch up"
     pin:
@@ -44,23 +59,46 @@ binary_sensor:
       mode: INPUT_PULLUP
       inverted: true
     on_press:
-      - switch.turn_off: relay_dir
-      - switch.turn_on: relay_en
-      - mqtt.publish:
-          topic: "hsg/backroof/opening"
-          payload: "switch"
+      then:
+        - switch.turn_on: relay_dir
+        - switch.turn_on: relay_en
+    on_release:
+      then:
+        - switch.turn_off: relay_en
 
 switch:
   - platform: gpio
     name: "roof enable relay"
     id: relay_en
     pin: D3
-    inverted: true
+    inverted: false
+    restore_mode: RESTORE_DEFAULT_ON
+    on_turn_on:
+      - mqtt.publish:
+          topic: "hsg/backroof/power"
+          payload: "1"
+          retain: true
+    on_turn_off:
+      - mqtt.publish:
+          topic: "hsg/backroof/power"
+          payload: "0"
+          retain: true
   - platform: gpio
     name: "roof direction relay"
     id: relay_dir
     pin: D4
     inverted: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    on_turn_on:
+      - mqtt.publish:
+          topic: "hsg/backroof/direction"
+          payload: "1"
+          retain: true
+    on_turn_off:
+      - mqtt.publish:
+          topic: "hsg/backroof/direction"
+          payload: "0"
+          retain: true
 
 status_led:
   pin:

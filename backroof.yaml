@@ -12,6 +12,10 @@ wifi:
 api:
 
 logger:
+  level: debug
+
+debug:
+  update_interval: 5s
 
 ota:
 
@@ -45,6 +49,8 @@ binary_sensor:
       number: D5
       mode: INPUT_PULLUP
       inverted: true
+    filters:
+      - delayed_on_off: 100ms
     on_press:
       then:
         - switch.turn_off: relay_dir
@@ -58,6 +64,8 @@ binary_sensor:
       number: D2
       mode: INPUT_PULLUP
       inverted: true
+    filters:
+      - delayed_on_off: 100ms
     on_press:
       then:
         - switch.turn_on: relay_dir

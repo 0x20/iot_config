@@ -26,21 +26,37 @@ mqtt:
     - topic: "hsg/backroof/direction"
       payload: "0"
       then:
-        - switch.turn_on: relay_en
-        - switch.turn_off: relay_dir
+        if:
+          condition:
+            switch.is_on: relay_dir
+          then:
+            - switch.turn_on: relay_en
+            - switch.turn_off: relay_dir
     - topic: "hsg/backroof/direction"
       payload: "1"
       then:
-        - switch.turn_on: relay_en
-        - switch.turn_on: relay_dir
+        if:
+          condition:
+            switch.is_off: relay_dir
+          then:
+            - switch.turn_on: relay_en
+            - switch.turn_on: relay_dir
     - topic: "hsg/backroof/power"
       payload: "1"
       then:
-        - switch.turn_on: relay_en
+        if:
+          condition:
+            switch.is_off: relay_en
+          then:
+            - switch.turn_on: relay_en
     - topic: "hsg/backroof/power"
       payload: "0"
       then:
-        - switch.turn_off: relay_en
+        if:
+          condition:
+            switch.is_on: relay_en
+          then:
+            - switch.turn_off: relay_en
 
 binary_sensor:
   - platform: gpio
@@ -81,32 +97,32 @@ switch:
     pin: D3
     inverted: false
     restore_mode: RESTORE_DEFAULT_ON
-    on_turn_on:
-      - mqtt.publish:
-          topic: "hsg/backroof/power"
-          payload: "1"
-          retain: true
-    on_turn_off:
-      - mqtt.publish:
-          topic: "hsg/backroof/power"
-          payload: "0"
-          retain: true
+#    on_turn_on:
+#      - mqtt.publish:
+#          topic: "hsg/backroof/power"
+#          payload: "1"
+#          retain: true
+#    on_turn_off:
+#      - mqtt.publish:
+#          topic: "hsg/backroof/power"
+#          payload: "0"
+#          retain: true
   - platform: gpio
     name: "roof direction relay"
     id: relay_dir
     pin: D4
     inverted: true
     restore_mode: RESTORE_DEFAULT_OFF
-    on_turn_on:
-      - mqtt.publish:
-          topic: "hsg/backroof/direction"
-          payload: "1"
-          retain: true
-    on_turn_off:
-      - mqtt.publish:
-          topic: "hsg/backroof/direction"
-          payload: "0"
-          retain: true
+#    on_turn_on:
+#      - mqtt.publish:
+#          topic: "hsg/backroof/direction"
+#          payload: "1"
+#          retain: true
+#    on_turn_off:
+#      - mqtt.publish:
+#          topic: "hsg/backroof/direction"
+#          payload: "0"
+#          retain: true
 
 status_led:
   pin:

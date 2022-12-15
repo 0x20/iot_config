@@ -45,6 +45,8 @@ i2c:
 #  sda: GPIO21
 #  scl: GPIO22
 bme680_bsec:
+  temperature_offset: 3
+  state_save_interval: 1h
 
 sensor:
   ### BME680
@@ -64,15 +66,15 @@ sensor:
   - platform: bme680_bsec
     temperature:
       name: "BME680 Temperature"
-      accuracy_decimals: 2
+      accuracy_decimals: 5
       retain: false
     pressure:
       name: "BME680 Pressure"
-      accuracy_decimals: 2
+      accuracy_decimals: 5
       retain: false
     humidity:
       name: "BME680 Humidity"
-      accuracy_decimals: 2
+      accuracy_decimals: 5
       retain: false
     gas_resistance:
       name: "BME680 Gas Resistance"
@@ -122,7 +124,7 @@ sensor:
   - platform: dallas
     name: "DS18B20"
     address: 0x8a01144f5e17aa28
-    accuracy_decimals: 2
+    accuracy_decimals: 4
     retain: false
 
 text_sensor:

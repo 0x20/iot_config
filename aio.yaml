@@ -42,9 +42,11 @@ uart:
 
 ### BME680
 i2c:
-#  sda: GPIO21
-#  scl: GPIO22
+  sda: GPIO21
+  scl: GPIO22
+  frequency: 1MHz
 bme680_bsec:
+  address: 0x76
   temperature_offset: 3
   state_save_interval: 1h
 

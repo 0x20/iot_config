@@ -133,4 +133,3 @@ text_sensor:
   - platform: bme680_bsec
     iaq_accuracy:
       name: "BME680 IAQ Accuracy"
-      retain: false

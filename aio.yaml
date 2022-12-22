@@ -68,14 +68,17 @@ sensor:
   - platform: bme680_bsec
     temperature:
       name: "BME680 Temperature"
+      id: bme680_temperature
       accuracy_decimals: 5
       retain: false
     pressure:
       name: "BME680 Pressure"
+      id: bme680_pressure
       accuracy_decimals: 5
       retain: false
     humidity:
       name: "BME680 Humidity"
+      id: bme680_humidity
       accuracy_decimals: 5
       retain: false
     gas_resistance:
@@ -95,6 +98,17 @@ sensor:
       name: "BME680 Breath VOC Equivalent"
       accuracy_decimals: 2
       retain: false
+
+  - platform: template
+    name: "BME680 Dew Point"
+    lambda: |-
+      return (243.5*(log(id(bme680_humidity).state/100)+((17.67*id(bme680_temperature).state)/
+      (243.5+id(bme680_temperature).state)))/(17.67-log(id(bme680_humidity).state/100)-
+      ((17.67*id(bme680_temperature).state)/(243.5+id(bme680_temperature).state))));
+    unit_of_measurement: °C
+    icon: 'mdi:thermometer-alert'
+    update_interval: 1s
+    retain: false
 
 ### PMSA003-A
   - platform: pmsx003

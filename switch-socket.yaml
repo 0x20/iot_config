@@ -1,10 +1,10 @@
 esphome:
-  name: 2stopcontact
+  name: switch-socket
   platform: ESP8266
   board: esp01_1m
 
 wifi:
-  ssid: 'iot'
+  ssid: "iot"
   domain: ".lan.0x20.be"
   password: !secret wifipassword
   fast_connect: false
@@ -17,9 +17,9 @@ ota:
 
 mqtt:
   broker: mqtt.lan.0x20.be
-  topic_prefix: "hsg/2stopcontact"
+  topic_prefix: "hsg/switch-socket"
   on_message:
-    topic: "hsg/2stopcontact/toggle"
+    topic: "hsg/switch-socket/toggle"
     then:
       - switch.toggle: relay
 
@@ -33,8 +33,24 @@ binary_sensor:
     on_press:
       - switch.toggle: relay
       - mqtt.publish:
-          topic: "hsg/2stopcontact/toggle"
+          topic: "hsg/switch-socket/toggle"
           payload: "button pressed"
+  - platform: gpio
+    pin:
+      number: GPIO14
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "Sonoff Basic Button"
+    on_press:
+      - switch.toggle: relay
+      - mqtt.publish:
+          topic: "hsg/switch-socket/toggle"
+          payload: "switch toggled"
+    on_release:
+      - switch.toggle: relay
+      - mqtt.publish:
+          topic: "hsg/switch-socket/toggle"
+          payload: "switch toggled"
 
 switch:
   - platform: gpio

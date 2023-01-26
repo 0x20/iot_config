@@ -10,9 +10,7 @@ wifi:
   fast_connect: false
 
 api:
-
 logger:
-
 ota:
 
 mqtt:
@@ -25,36 +23,36 @@ mqtt:
 
 binary_sensor:
   - platform: gpio
+    name: "Sonoff Basic Button"
     pin:
       number: GPIO0
       mode: INPUT_PULLUP
       inverted: True
-    name: "Sonoff Basic Button"
     on_press:
       - switch.toggle: relay
       - mqtt.publish:
-          topic: "hsg/switch-socket/toggle"
-          payload: "button pressed"
+          topic: "hsg/switch-socket/toggled"
+          payload: "button"
   - platform: gpio
+    name: "switch"
     pin:
       number: GPIO14
       mode: INPUT_PULLUP
       inverted: True
-    name: "Sonoff Basic Button"
     on_press:
       - switch.toggle: relay
       - mqtt.publish:
-          topic: "hsg/switch-socket/toggle"
-          payload: "switch toggled"
+          topic: "hsg/switch-socket/toggled"
+          payload: "switch"
     on_release:
       - switch.toggle: relay
       - mqtt.publish:
-          topic: "hsg/switch-socket/toggle"
-          payload: "switch toggled"
+          topic: "hsg/switch-socket/toggled"
+          payload: "switch"
 
 switch:
   - platform: gpio
-    name: "Sonoff Basic Relay"
+    name: "socket"
     pin: GPIO12
     id: relay
 
